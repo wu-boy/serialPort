@@ -19,7 +19,7 @@ import java.util.TooManyListenersException;
 /**
  * 串口工具类
  * @author wusq
- * @date 2021/1/1
+ * @date 2021/1/7
  */
 public class SerialPortUtils {
 
@@ -93,13 +93,20 @@ public class SerialPortUtils {
             inputStream = serialPort.getInputStream();
 
             // 缓冲区大小为1个字节，可根据实际需求修改
-            byte[] readBuffer = new byte[7];
+            byte[] readBuffer = new byte[1];
 
+            while (inputStream.available() > 0) {
+                inputStream.read(readBuffer);
+                result = ArrayUtil.addAll(result, readBuffer);
+            }
+
+            /*// 这种读取方式可能会存在问题
+            // 每次读取最后一个字节后可能会莫名其妙卡住200毫秒
             int bytesNum = inputStream.read(readBuffer);
             while (bytesNum > 0) {
                 result = ArrayUtil.addAll(result, readBuffer);
                 bytesNum = inputStream.read(readBuffer);
-            }
+            }*/
         } catch (IOException e) {
             log.error("串口{}读取数据错误", serialPort.getName(), e);
         } finally {
